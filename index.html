@@ -3,139 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduShuffle | Exam Variant Generator</title>
+    <title>SaniText AI | Clean Formatting for Docs</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        @media print {
-            body { background: white; color: black; }
-            .no-print { display: none !important; }
-            .print-page { page-break-after: always; box-shadow: none; border: none; background: white; padding: 0; margin-bottom: 2rem; }
-        }
+        .rich-output h1 { font-size: 1.6rem; font-weight: 700; color: #1e293b; margin-top: 1.25rem; margin-bottom: 0.5rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.25rem; }
+        .rich-output h2 { font-size: 1.3rem; font-weight: 600; color: #334155; margin-top: 1.1rem; margin-bottom: 0.4rem; }
+        .rich-output h3 { font-size: 1.1rem; font-weight: 600; color: #475569; margin-top: 1rem; margin-bottom: 0.4rem; }
+        .rich-output p { margin-bottom: 0.75rem; line-height: 1.6; color: #334155; }
+        .rich-output strong { color: #0f172a; font-weight: 600; }
+        .rich-output ul, .rich-output ol { padding-left: 1.25rem; margin-bottom: 0.75rem; list-style-type: disc; color: #334155; }
+        .rich-output ol { list-style-type: decimal; }
+        .rich-output li { margin-bottom: 0.2rem; }
+        .rich-output code { background-color: #f1f5f9; padding: 0.15rem 0.3rem; border-radius: 4px; font-family: monospace; font-size: 0.9em; color: #0f172a; border: 1px solid #e2e8f0; }
+        .rich-output pre { background-color: #f8fafc; padding: 0.85rem; border-radius: 6px; overflow-x: auto; margin: 0.85rem 0; border: 1px solid #e2e8f0; }
+        .rich-output blockquote { border-left: 3px solid #6366f1; padding-left: 0.85rem; color: #64748b; font-style: italic; margin: 0.85rem 0; }
     </style>
 </head>
 <body class="bg-[#fafafa] text-slate-800 min-h-screen flex flex-col justify-between antialiased">
 
-    <header class="border-b border-slate-200 bg-white no-print">
+    <header class="border-b border-slate-200/80 bg-white/80 backdrop-blur sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <span class="text-md font-bold tracking-tight text-slate-900">EduShuffle<span class="text-indigo-600">.io</span></span>
+            <div class="flex items-center space-x-2.5">
+                <span class="text-md font-bold tracking-tight text-slate-900">SaniText<span class="text-indigo-600">.ai</span></span>
             </div>
-            <button onclick="loadSampleExam()" class="text-xs bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1.5 rounded-md font-medium transition">
-                Load Sample Exam
+            <button onclick="loadSample()" class="text-xs bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 px-3 py-1.5 rounded-md font-medium transition">
+                Try Sample Input
             </button>
         </div>
     </header>
 
     <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-10">
-        <div class="mb-8 no-print">
-            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Multi-Version Exam Generator</h1>
+        <div class="text-center sm:text-left mb-8">
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">AI Text Sanitizer</h1>
             <p class="text-slate-500 mt-1.5 text-sm max-w-xl">
-                Paste your question sheets below. The algorithm scrambles option sets uniformly to prevent test cheating. 
+                Paste raw ChatGPT outputs to strip out markdown bugs and double returns. Formats cleanly for direct pasting into Word or Google Docs.
             </p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch no-print">
-            <div class="lg:col-span-5 flex flex-col space-y-3">
-                <div class="flex items-center justify-between">
-                    <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Raw Exam Script</label>
-                    <button onclick="clearInput()" class="text-xs text-slate-400 hover:text-slate-600 transition">Clear</button>
-                </div>
-                <textarea id="exam-input" class="w-full h-[320px] bg-white border border-slate-200 focus:border-indigo-500 rounded-xl p-4 text-slate-700 font-mono text-xs leading-relaxed focus:outline-none transition shadow-sm placeholder:text-slate-300" placeholder="1. Question text here?&#10;A) Option 1&#10;B) Option 2..."></textarea>
-                <button onclick="generateVersions()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs shadow-sm transition">
-                    Shuffle & Generate Sheets
-                </button>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <div class="bg-white border border-slate-200 rounded-xl p-3">
+                <span class="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Words</span>
+                <div id="stat-words" class="text-lg font-bold text-slate-800 mt-0.5">0</div>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-xl p-3">
+                <span class="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Characters</span>
+                <div id="stat-chars" class="text-lg font-bold text-slate-800 mt-0.5">0</div>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-xl p-3">
+                <span class="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Read Time</span>
+                <div id="stat-readtime" class="text-lg font-bold text-indigo-600 mt-0.5">0m</div>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-xl p-3">
+                <span class="text-[11px] text-slate-400 font-medium uppercase tracking-wider">Formatting Health</span>
+                <div id="stat-clean" class="text-lg font-bold text-slate-700 mt-0.5">100%</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+            <div class="flex flex-col space-y-2">
+                <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Raw Input</label>
+                <textarea id="raw-input" oninput="processSanitization()" class="w-full h-[380px] bg-white border border-slate-200 focus:border-indigo-500 rounded-xl p-4 text-slate-700 font-mono text-sm leading-relaxed focus:outline-none transition placeholder:text-slate-300 shadow-sm" placeholder="Paste raw text here..."></textarea>
             </div>
 
-            <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
-                <div class="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm">
-                    <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Randomization Settings</h2>
-                    <div class="space-y-2">
-                        <label class="flex items-center space-x-2 text-xs font-medium text-slate-600 cursor-pointer">
-                            <input type="checkbox" id="shuffle-q" checked class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
-                            <span>Scramble Question Sequence Order</span>
-                        </label>
-                        <label class="flex items-center space-x-2 text-xs font-medium text-slate-600 cursor-pointer">
-                            <input type="checkbox" id="shuffle-o" checked class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
-                            <span>Randomize Multiple Choice Layouts</span>
-                        </label>
+            <div class="flex flex-col space-y-2">
+                <label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Clean Document Preview</label>
+                <div id="formatted-output" class="rich-output w-full h-[380px] bg-white border border-slate-200 rounded-xl p-4 overflow-y-auto shadow-sm">
+                    <div class="text-slate-400 italic h-full flex items-center justify-center text-center text-xs">
+                        Awaiting raw input text...
                     </div>
-                </div>
-
-                <div class="bg-slate-100/50 border border-slate-200 rounded-xl p-4 flex items-center justify-between">
-                    <div>
-                        <h4 class="text-xs font-bold text-slate-800">Print Operations</h4>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Prints out crisp, ready-to-use version copies.</p>
-                    </div>
-                    <button onclick="window.print()" class="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold shadow-sm transition">
-                        Print Exam Versions
-                    </button>
                 </div>
             </div>
         </div>
 
-        <div id="print-output-root" class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 print:block"></div>
+        <div class="mt-4 bg-white border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-4">
+                <label class="inline-flex items-center cursor-pointer text-xs font-medium text-slate-500">
+                    <input type="checkbox" id="opt-clean-newlines" checked onchange="processSanitization()" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 mr-2">
+                    Fix Double Spacing
+                </label>
+                <label class="inline-flex items-center cursor-pointer text-xs font-medium text-slate-500">
+                    <input type="checkbox" id="opt-strip-backticks" checked onchange="processSanitization()" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 mr-2">
+                    Clean Code Ticks
+                </label>
+            </div>
+            <div class="flex space-x-2 w-full sm:w-auto">
+                <button onclick="clearAll()" class="px-4 py-2 text-xs font-medium text-slate-400 hover:text-slate-600 transition w-1/2 sm:w-auto">Clear</button>
+                <button id="btn-copy" onclick="copyFormattedText()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs shadow-sm transition w-1/2 sm:w-auto">
+                    Copy Clean Text
+                </button>
+            </div>
+        </div>
     </main>
 
     <section class="max-w-6xl w-full mx-auto px-4 mb-8 no-print">
         <div class="bg-indigo-50/50 border border-indigo-100 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between text-center sm:text-left gap-3">
             <div>
                 <h4 class="text-xs font-bold text-indigo-900 uppercase tracking-wide">Try my other apps</h4>
-                <p class="text-xs text-indigo-700/80 mt-0.5">Need to fix messy AI content formatting? Clean your clipboard text instantly.</p>
+                <p class="text-xs text-indigo-700/80 mt-0.5">Need to prevent test cheating? Re-scramble test papers instantly.</p>
             </div>
-            <a href="sanitizer.html" class="px-4 py-1.5 bg-white hover:bg-indigo-100 text-indigo-600 font-semibold rounded-lg border border-indigo-200 text-xs shadow-sm transition whitespace-nowrap">
-                Launch SaniText &rarr;
+            <a href="shuffler.html" class="px-4 py-1.5 bg-white hover:bg-indigo-100 text-indigo-600 font-semibold rounded-lg border border-indigo-200 text-xs shadow-sm transition whitespace-nowrap">
+                Launch EduShuffle &rarr;
             </a>
         </div>
     </section>
 
-    <footer class="border-t border-slate-200 bg-white py-4 text-center text-xs text-slate-400 no-print">
-        &copy; 2026 EduShuffle Engine. Formatted clearly.
+    <footer class="border-t border-slate-200 bg-white py-4 text-center text-xs text-slate-400">
+        &copy; 2026 SaniText Utility. Built for efficiency.
     </footer>
 
     <script>
-        const sampleExam = `1. What is the derivative of x^2?\nA) x\nB) 2x\nC) 2\nD) x^2\n\n2. Which strategy yields reliable micro-business observation loops?\nA) Waiting on outside corporate venture calls\nB) Deploying quick, single-purpose logic apps directly to consumers\nC) Reading outdated 900-page operational guides\nD) Building heavy logistics hubs blindly`;
-        function loadSampleExam() { document.getElementById('exam-input').value = sampleExam.trim(); generateVersions(); }
-        function clearInput() { document.getElementById('exam-input').value = ''; document.getElementById('print-output-root').innerHTML = ''; }
-        function arrayShuffle(arr) {
-            let cur = arr.length, temp, idx;
-            while (cur !== 0) { idx = Math.floor(Math.random() * cur); cur -= 1; temp = arr[cur]; arr[cur] = arr[idx]; arr[idx] = temp; }
-            return arr;
+        const sampleText = `### # AI Document Layout Sample\n\nThis is a standard raw block showing how **AI strings** paste poorly:\n\n1. **First Issue**: Gray block errors.\n2. **Second Issue**: Raw \`###\` text codes showing up everywhere.\n\n> "Clean styling enhances cognitive readability." - Logic Engine`;
+        function loadSample() { document.getElementById('raw-input').value = sampleText; processSanitization(); }
+        function clearAll() { document.getElementById('raw-input').value = ''; processSanitization(); }
+        function processSanitization() {
+            let text = document.getElementById('raw-input').value;
+            const outputEl = document.getElementById('formatted-output');
+            if (!text.trim()) {
+                outputEl.innerHTML = '<div class="text-slate-400 italic h-full flex items-center justify-center text-center text-xs">Awaiting raw input text...</div>';
+                updateStats(0, 0); return;
+            }
+            const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+            updateStats(words, text.length);
+            let html = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            if (document.getElementById('opt-clean-newlines').checked) html = html.replace(/\n{3,}/g, '\n\n');
+            html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>').replace(/^## (.*$)/gim, '<h2>$1</h2>').replace(/^# (.*$)/gim, '<h1>$1</h1>');
+            html = html.replace(/^&gt;\s*(.*$)/gim, '<blockquote>$1</blockquote>');
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/__(.*?)__/g, '<strong>$1</strong>');
+            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/_(.*?)_/g, '<em>$1</em>');
+            if (document.getElementById('opt-strip-backticks').checked) { html = html.replace(/\`(.*?)\`/g, '<code>$1</code>'); }
+            html = html.replace(/^\s*[\-\*]\s+(.*$)/gim, '<li>$1</li>');
+            html = html.replace(/\n/g, '<br>');
+            outputEl.innerHTML = html;
         }
-        function parseExamData(raw) {
-            const lines = raw.split('\n'); const questions = []; let curQ = null;
-            lines.forEach(l => {
-                const tr = l.trim(); if (!tr) return;
-                const isQ = tr.match(/^\d+[\.\)]\s*(.*)/); const isO = tr.match(/^[A-E][\.\)]\s*(.*)/i);
-                if (isQ) { if (curQ) questions.push(curQ); curQ = { text: isQ[1], options: [] }; }
-                else if (isO && curQ) { curQ.options.push(isO[1]); }
-                else if (curQ) { curQ.text += " " + tr; }
-            });
-            if (curQ) questions.push(curQ); return questions;
+        function updateStats(w, c) {
+            document.getElementById('stat-words').innerText = w;
+            document.getElementById('stat-chars').innerText = c;
+            document.getElementById('stat-readtime').innerText = Math.ceil(w / 200) + 'm';
+            const m = document.getElementById('raw-input').value.match(/[\#\*\_`]/g) || [];
+            document.getElementById('stat-clean').innerText = w > 0 ? Math.round(Math.max(0, 100 - (m.length * 1.5))) + '%' : '100%';
         }
-        function generateVersions() {
-            const input = document.getElementById('exam-input').value;
-            const root = document.getElementById('print-output-root');
-            if (!input.trim()) { root.innerHTML = ''; return; }
-            const master = parseExamData(input);
-            if (master.length === 0) { root.innerHTML = '<div class="text-xs text-red-500 p-2 col-span-2">Parsing mismatch. Verify items match pattern formats.</div>'; return; }
-            root.innerHTML = '';
-            ['Version A', 'Version B'].forEach(vName => {
-                let copies = JSON.parse(JSON.stringify(master));
-                if (document.getElementById('shuffle-q').checked) copies = arrayShuffle(copies);
-                if (document.getElementById('shuffle-o').checked) copies.forEach(q => q.options = arrayShuffle(q.options));
-                const card = document.createElement('div');
-                card.className = "bg-white border border-slate-200 rounded-xl p-5 print-page shadow-sm text-xs";
-                let html = `<div class="border-b border-slate-100 pb-2 mb-3"><h3 class="font-bold text-slate-800 text-sm">${vName}</h3></div><div class="space-y-4">`;
-                copies.forEach((q, qIdx) => {
-                    html += `<div><p class="font-semibold text-slate-800">${qIdx + 1}. ${q.text}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-1 mt-1 pl-2">`;
-                    const alpha = ['A', 'B', 'C', 'D', 'E'];
-                    q.options.forEach((opt, oIdx) => { html += `<span class="text-slate-500"><strong class="text-slate-700 mr-0.5">${alpha[oIdx]})</strong> ${opt}</span>`; });
-                    html += `</div></div>`;
-                });
-                card.innerHTML = html + `</div>`; root.appendChild(card);
-            });
+        function copyFormattedText() {
+            const el = document.getElementById('formatted-output');
+            const btn = document.getElementById('btn-copy');
+            const range = document.createRange();
+            range.selectNode(el);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            try {
+                if(document.execCommand('copy')) {
+                    btn.innerText = 'Copied!';
+                    setTimeout(() => { btn.innerText = 'Copy Clean Text'; }, 2000);
+                }
+            } catch (err) { alert('Unable to auto copy.'); }
+            window.getSelection().removeAllRanges();
         }
     </script>
 </body>
